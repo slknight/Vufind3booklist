@@ -6,11 +6,11 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
-<link href="https://vufind3.carli.illinois.edu/vf-eiu/themes/bootprint3/css/compiled.css?_=1503498542" media="all" rel="stylesheet" type="text/css">
-<link href="https://vufind3.carli.illinois.edu/vf-eiu/themes/bootstrap3/css/print.css?_=1492615371" media="print" rel="stylesheet" type="text/css">
-<link href="https://vufind3.carli.illinois.edu/vf-eiu/themes/carli/css/carli.css?_=1503498542" media="all" rel="stylesheet" type="text/css">
-<link href="https://vufind3.carli.illinois.edu/vf-eiu/themes/eiu/css/institution.css?_=1502378085" media="all" rel="stylesheet" type="text/css">
-<link href="https://vufind3.carli.illinois.edu/vf-eiu/themes/carli/images/carli-favicon.ico" rel="shortcut icon" type="image/x-icon">
+<link href="https://i-share.carli.illinois.edu/vf-eiu/themes/bootprint3/css/compiled.css?_=1511385145" media="all" rel="stylesheet" type="text/css">
+<link href="https://i-share.carli.illinois.edu/vf-eiu/themes/bootstrap3/css/print.css?_=1507749433" media="print" rel="stylesheet" type="text/css">
+<link href="https://i-share.carli.illinois.edu/vf-eiu/themes/carli/css/carli.css?_=1507749433" media="all" rel="stylesheet" type="text/css">
+<link href="https://i-share.carli.illinois.edu/vf-eiu/themes/eiu/css/institution.css?_=1507749433" media="all" rel="stylesheet" type="text/css">
+<link href="https://i-share.carli.illinois.edu/vf-eiu/themes/carli/images/carli-favicon.ico" rel="shortcut icon" type="image/x-icon">
 
 
 <style type="text/css">
@@ -19,11 +19,15 @@
 .save-Record {visibility:hidden;}
 .savedlists {visibility:hidden;}
 .checkbox {visibility:hidden;}
+.Record-checkbox {visibility:hidden;}
+.checkbox-select-item {visibility:hidden;}
 .callnumber {visibility:hidden;}
 .location {visibility:hidden;}
 .hideifdetailed {visibility:hidden;}
 .Book {visibility:hidden; }
 .fulltext {padding-right: 5px;}
+.openurlcontrols {visibility:hidden; }
+.Record-number {visibility:hidden; }
 
 .Hidden-print {width: 0; height: 0;}
 
@@ -39,6 +43,19 @@
 .media-body {width: 500px;}
 .result {width: 500px;}
 
+.media-left {width: 150px;
+}
+
+.Textualmaterial {visibility:hidden; }
+
+
+<?php foreach (range(0, 100) as $number) {
+    echo "#result". $number ." {background-color: #FFF;}";}
+?>
+
+
+
+
 </style>
 
 </head>
@@ -48,7 +65,7 @@
 
 <?php
 
-/* this is designed to work with CARLI's VuFind 3.0 implimentation. The style above are necesary to hide certian elements. This would have been more elegant written to an array, but I'm lazy and bad with arrays.*/
+/*this is designed to work with CARLI's VuFind 4.1 implementation. The style above are necessary to hide certain elements. This would have been more elegant written to an array, but I'm lazy and bad with arrays.*/
 
 
 
@@ -107,14 +124,14 @@ $rawtitle=str_replace(' : ', ': ', $rawtitle);
 
 
 //the tag to look up is set in the URL. 
-//$url="https://vufind3.carli.illinois.edu/vf-eiu/Tag/Home?lookfor=eiu_health_careers";
+//$url="https://i-share.carli.illinois.edu/vf-eiu/Tag/Home?lookfor=eiu_health_careers";
 
 
 if (isset($_GET['tag']))
 {$tag=$_GET['tag'];}
 
 
-$url="https://vufind3.carli.illinois.edu/vf-eiu/Tag/Home?lookfor=" . $tag;
+$url="https://i-share.carli.illinois.edu/vf-eiu/Tag/Home?lookfor=" . $tag;
 
 
 
@@ -140,11 +157,19 @@ foreach ($divs as $div) {
    //remove whitespace
     $string=preg_replace("/\s+/", " ", $string );
 	
-	//add the begining of teh URLs since we are not on CARLI's server
-   
-   $string=str_replace("/vf-eiu/Cover/", "https://vufind3.carli.illinois.edu/vf-eiu/Cover/", $string);
-   $string=str_replace("/vf-eiu/Author/", "https://vufind3.carli.illinois.edu/vf-eiu/Author/", $string);
-    $string=str_replace("/vf-eiu/Record/", "https://vufind3.carli.illinois.edu/vf-eiu/Record/", $string);
+	//add the begining of the URLs since we are not on CARLI's server
+
+$string=preg_replace("/\<i class.*?\<\/i>/", "", $string);
+
+
+//$string=preg_replace("/\<script =Type=\"text\/javascript\" Src=\"\/vf-eiu\/themes\/bootstrap3\/js\/openurl.js?_\= /", " ", $string);
+
+//$string=preg_replace("/\<script type=\"text\/javascript\" src=\"\/vf\-eiu\/themes\/bootstrap3\/js\/openurl\.js\?_\=\d{10}\"\/\>/", " ", $string);
+
+
+   $string=str_replace("/vf-eiu/Cover/", "https://i-share.carli.illinois.edu/vf-eiu/Cover/", $string);
+   $string=str_replace("/vf-eiu/Author/", "https://i-share.carli.illinois.edu/vf-eiu/Author/", $string);
+    $string=str_replace("/vf-eiu/Record/", "https://i-share.carli.illinois.edu/vf-eiu/Record/", $string);
 	
 	//set cover image to a consistant width
 
@@ -158,6 +183,10 @@ foreach ($divs as $div) {
    
    //capialize and remove slashes
        $string=to_title_case($string);
+
+//fix ampersands
+
+  $string=str_replace("&amp;", "&", $string);
 	   
 //we trashed the case, so fix that sonlinks work again	   
  $string=str_replace("eiudb", "EIUdb", $string);
@@ -190,6 +219,17 @@ $string=str_replace("%2c\">", "%2c\" target=\"_blank\">", $string);
 
 $string=str_replace(".\">", ".\" target=\"_blank\">", $string);
 
+
+$string=str_replace("Contributor Biographical Information", "", $string);
+
+$string=str_replace("Textual Material", "", $string);
+
+
+$string=str_replace("Address at Time Of Purl Creation", "", $string);
+
+$string=str_replace("Eiu", "EIU", $string);
+
+
 //put line breaks back in 
    
    $string=str_replace(">", ">\n", $string);
@@ -199,16 +239,12 @@ $string=str_replace(".\">", ".\" target=\"_blank\">", $string);
    $string = iconv("UTF-8", "UTF-8//IGNORE", $string);
   
    
-   
+   echo "</div>";
   
    echo $string;
    
 }
    
-
-
-
-
 
 ?>
 
@@ -217,4 +253,6 @@ $string=str_replace(".\">", ".\" target=\"_blank\">", $string);
 
 
 </html>
+
+
 
